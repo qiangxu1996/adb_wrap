@@ -2,32 +2,23 @@ import os
 import subprocess
 
 
-def command(args, test=False):
-    cmd = ['adb']
-    cmd += args
-    if test:
-        return subprocess.run(cmd, stdout=subprocess.DEVNULL).returncode
+def command(args, wait=True, test=False):
+    cmd = ['adb'] + args
+    if not wait:
+        return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    elif test:
+        return subprocess.run(cmd, capture_output=True).returncode
     else:
-        return subprocess.run(cmd, check=True,
-                              stdout=subprocess.PIPE, encoding='utf-8'
-                              ).stdout
+        return subprocess.run(cmd, capture_output=True, check=True, text=True).stdout
 
 
 def shell(args, root=False, wait=True, test=False):
-    cmd = ['adb', 'shell']
+    cmd = ['shell']
     if root:
         cmd += ['su', 'root']
         # cmd += ['su', '-c']
     cmd += args
-    if wait:
-        if test:
-            return subprocess.run(cmd, stdout=subprocess.DEVNULL).returncode
-        else:
-            return subprocess.run(cmd, check=True,
-                                  stdout=subprocess.PIPE, encoding='utf-8'
-                                  ).stdout
-    else:
-        return subprocess.Popen(cmd)
+    return command(cmd, wait, test)
 
 
 def pull(file, dest=None):
