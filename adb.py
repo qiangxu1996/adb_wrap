@@ -1,5 +1,14 @@
 import os
 import subprocess
+from enum import Enum
+
+
+class Su(Enum):
+    AOSP = 1
+    MAGISK = 2
+
+
+su_variant = Su.AOSP
 
 
 def command(args, wait=True, test=False):
@@ -15,8 +24,10 @@ def command(args, wait=True, test=False):
 def shell(args, root=False, wait=True, test=False):
     cmd = ['shell']
     if root:
-        cmd += ['su', 'root']
-        # cmd += ['su', '-c']
+        if su_variant == Su.AOSP:
+            cmd += ['su', 'root']
+        elif su_variant == Su.MAGISK:
+            cmd += ['su', '-c']
     cmd += args
     return command(cmd, wait, test)
 
