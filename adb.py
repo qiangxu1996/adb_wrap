@@ -8,7 +8,7 @@ class Su(Enum):
     MAGISK = 2
 
 
-su_variant = Su.AOSP
+_su_variant = Su.AOSP
 
 
 def command(args, wait=True, test=False):
@@ -24,9 +24,9 @@ def command(args, wait=True, test=False):
 def shell(args, root=False, wait=True, test=False):
     cmd = ['shell']
     if root:
-        if su_variant == Su.AOSP:
+        if _su_variant == Su.AOSP:
             cmd += ['su', 'root']
-        elif su_variant == Su.MAGISK:
+        elif _su_variant == Su.MAGISK:
             cmd += ['su', '-c']
     cmd += args
     return command(cmd, wait, test)
@@ -50,3 +50,8 @@ def push(file, dest, sync: bool = False):
 
 def default_device(serial: str):
     os.environ['ANDROID_SERIAL'] = serial
+
+
+def su_variant(variant):
+    global _su_variant
+    _su_variant = variant
