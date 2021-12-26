@@ -8,20 +8,18 @@ class Su(Enum):
     MAGISK = 2
 
 
-_su_variant = Su.AOSP
+_su_variant = Su.MAGISK
 
 
-def command(args, wait=True, test=False):
+def command(args, check=True, wait=True):
     cmd = ['adb'] + args
     if not wait:
         return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    elif test:
-        return subprocess.run(cmd, capture_output=True).returncode
     else:
-        return subprocess.run(cmd, capture_output=True, check=True, text=True).stdout
+        return subprocess.run(cmd, capture_output=True, check=check, text=True)
 
 
-def shell(args, root=False, wait=True, test=False):
+def shell(args, root=False, check=True, wait=True):
     cmd = ['shell']
     if root:
         if _su_variant == Su.AOSP:
@@ -29,7 +27,7 @@ def shell(args, root=False, wait=True, test=False):
         elif _su_variant == Su.MAGISK:
             cmd += ['su', '-c']
     cmd += args
-    return command(cmd, wait, test)
+    return command(cmd, check, wait)
 
 
 def pull(file, dest=None):
